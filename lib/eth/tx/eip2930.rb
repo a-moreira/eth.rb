@@ -85,7 +85,7 @@ module Eth
         fields = { recovery_id: nil, r: 0, s: 0 }.merge params
 
         # populate optional fields with serializable empty values
-        fields[:chain_id] = Tx.sanitize_chain fields[:chain_id]
+        fields[:chainId] = Tx.sanitize_chain fields[:chainId]
         fields[:from] = Tx.sanitize_address fields[:from]
         fields[:to] = Tx.sanitize_address fields[:to]
         fields[:value] = Tx.sanitize_amount fields[:value]
@@ -94,25 +94,25 @@ module Eth
         # ensure sane values for all mandatory fields
         fields = Tx.validate_params fields
         fields = Tx.validate_legacy_params fields
-        fields[:access_list] = Tx.sanitize_list fields[:access_list]
+        fields[:accessList] = Tx.sanitize_list fields[:accessList]
 
         # ensure gas limit is not too low
-        minimum_cost = Tx.estimate_intrinsic_gas fields[:data], fields[:access_list]
-        raise ParameterError, "Transaction gas limit is too low, try #{minimum_cost}!" if fields[:gas_limit].to_i < minimum_cost
+        minimum_cost = Tx.estimate_intrinsic_gas fields[:data], fields[:accessList]
+        raise ParameterError, "Transaction gas limit is too low, try #{minimum_cost}!" if fields[:gasLimit].to_i < minimum_cost
 
         # populate class attributes
         @signer_nonce = fields[:nonce].to_i
-        @gas_price = fields[:gas_price].to_i
-        @gas_limit = fields[:gas_limit].to_i
+        @gas_price = fields[:gasPrice].to_i
+        @gas_limit = fields[:gasLimit].to_i
         @sender = fields[:from].to_s
         @destination = fields[:to].to_s
         @amount = fields[:value].to_i
         @payload = fields[:data]
-        @access_list = fields[:access_list]
+        @access_list = fields[:accessList]
 
         # the signature v is set to the chain id for unsigned transactions
         @signature_y_parity = fields[:recovery_id]
-        @chain_id = fields[:chain_id]
+        @chain_id = fields[:chainId]
 
         # the signature fields are empty for unsigned transactions.
         @signature_r = fields[:r]

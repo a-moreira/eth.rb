@@ -88,19 +88,19 @@ module Eth
     def new(params, chain_id = Chain::ETHEREUM)
 
       # if we deal with max gas fee parameter, attempt EIP-1559
-      unless params[:max_gas_fee].nil?
-        params[:chain_id] = chain_id if params[:chain_id].nil?
+      unless params[:maxFeePerGas].nil?
+        params[:chainId] = chain_id if params[:chainId].nil?
         return Tx::Eip1559.new params
       end
 
       # if we deal with access list parameter, attempt EIP-2930
-      unless params[:access_list].nil?
-        params[:chain_id] = chain_id if params[:chain_id].nil?
+      unless params[:accessList].nil?
+        params[:chainId] = chain_id if params[:chainId].nil?
         return Tx::Eip2930.new params
       end
 
       # if nothing else, go with legacy transactions
-      chain_id = params[:chain_id] if !params[:chain_id].nil? and params[:chain_id] != chain_id
+      chain_id = params[:chainId] if !params[:chainId].nil? and params[:chainId] != chain_id
       return Tx::Legacy.new params, chain_id
     end
 
@@ -203,14 +203,14 @@ module Eth
       if fields[:nonce].nil? or fields[:nonce] < 0
         raise ParameterError, "Invalid signer nonce #{fields[:nonce]}!"
       end
-      if fields[:gas_limit].nil? or fields[:gas_limit] < DEFAULT_GAS_LIMIT or fields[:gas_limit] > BLOCK_GAS_LIMIT
-        raise ParameterError, "Invalid gas limit #{fields[:gas_limit]}!"
+      if fields[:gasLimit].nil? or fields[:gasLimit] < DEFAULT_GAS_LIMIT or fields[:gasLimit] > BLOCK_GAS_LIMIT
+        raise ParameterError, "Invalid gas limit #{fields[:gasLimit]}!"
       end
       unless fields[:value] >= 0
         raise ParameterError, "Invalid transaction value #{fields[:value]}!"
       end
-      unless fields[:access_list].nil? or fields[:access_list].is_a? Array
-        raise ParameterError, "Invalid access list #{fields[:access_list]}!"
+      unless fields[:accessList].nil? or fields[:accessList].is_a? Array
+        raise ParameterError, "Invalid access list #{fields[:accessList]}!"
       end
       return fields
     end
@@ -223,11 +223,11 @@ module Eth
     # @raise [ParameterError] if priority fee is invalid.
     # @raise [ParameterError] if max gas fee is invalid.
     def validate_eip1559_params(fields)
-      if fields[:priority_fee].nil? or fields[:priority_fee] < 0
-        raise ParameterError, "Invalid gas priority fee #{fields[:priority_fee]}!"
+      if fields[:maxPriorityFeePerGas].nil? or fields[:maxPriorityFeePerGas] < 0
+        raise ParameterError, "Invalid gas priority fee #{fields[:maxPriorityFeePerGas]}!"
       end
-      if fields[:max_gas_fee].nil? or fields[:max_gas_fee] < 0
-        raise ParameterError, "Invalid max gas fee #{fields[:max_gas_fee]}!"
+      if fields[:maxFeePerGas].nil? or fields[:maxFeePerGas] < 0
+        raise ParameterError, "Invalid max gas fee #{fields[:maxFeePerGas]}!"
       end
       return fields
     end
@@ -238,8 +238,8 @@ module Eth
     # @return [Hash] the validated transaction fields.
     # @raise [ParameterError] if gas price is invalid.
     def validate_legacy_params(fields)
-      if fields[:gas_price].nil? or fields[:gas_price] < 0
-        raise ParameterError, "Invalid gas price #{fields[:gas_price]}!"
+      if fields[:gasPrice].nil? or fields[:gasPrice] < 0
+        raise ParameterError, "Invalid gas price #{fields[:gasPrice]}!"
       end
       return fields
     end
